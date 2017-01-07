@@ -1,0 +1,13 @@
+{
+  "clusters": [
+    {
+      "activeServicesCount": 2,
+      "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/cluster1",
+      "clusterName": "cluster1",
+      "pendingTasksCount": 0,
+      "registeredContainerInstancesCount": 3,
+      "runningTasksCount": 9,
+      "status": "ACTIVE"
+    }
+  ]
+}

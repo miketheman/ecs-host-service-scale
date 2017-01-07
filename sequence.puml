@@ -1,0 +1,33 @@
+@startuml
+
+participant ECS
+participant CloudWatch
+participant Lambda
+
+ECS -> CloudWatch: State Change
+activate CloudWatch
+CloudWatch -> Lambda: Event payload
+deactivate CloudWatch
+Lambda -> ECS: describe_services
+activate ECS
+alt service not in cluster
+  ECS -> Lambda: 'failures': [MISSING]
+  note right: exit
+else service exists in cluster
+  ECS -> Lambda: desiredCount
+  deactivate ECS
+  activate Lambda
+  Lambda -> ECS: describe_clusters
+  activate ECS
+  ECS -> Lambda: registered_instances
+  deactivate ECS
+  Lambda -> Lambda: inspect desiredCount
+  note left: exit if equal
+  Lambda -> ECS: set desired = registered
+  activate ECS
+  ECS -> Lambda: OK
+  deactivate ECS
+  deactivate Lambda
+end
+
+@enduml
