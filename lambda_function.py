@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     if not event:
         raise ValueError("No event provided.")
 
-    if not event["source"] == "aws.ecs":
+    if event["source"] != "aws.ecs":
         raise ValueError("Function only supports input from events with a source type of: aws.ecs")
 
     service = os.getenv('ECS_SERVICE_ARN')
@@ -59,7 +59,7 @@ def lambda_handler(event, context):
         raise ValueError("Need to set `ECS_SERVICE_ARN` env var to serviceArn.")
 
     # Determine if this event is one that we care about
-    if not event["detail-type"] == "ECS Container Instance State Change":
+    if event["detail-type"] != "ECS Container Instance State Change":
         print("SKIP: Function operates only on ECS Container Instance State Change events.")
         return
 
