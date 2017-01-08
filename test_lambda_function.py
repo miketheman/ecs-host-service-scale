@@ -50,22 +50,21 @@ def test_no_service_env_var(ecs_event):
         lambda_function.lambda_handler(ecs_event, None)
 
 
-def test_event_no_match(ecs_task_event, capsys, monkeypatch):
+def test_event_no_match(ecs_task_event, mocker, monkeypatch):
     monkeypatch.setenv('ECS_SERVICE_ARN', AGENT_SERVICE_ARN)
+    mocker.patch.object(lambda_function, 'adjust_service_desired_count')
     lambda_function.lambda_handler(ecs_task_event, None)
-    out, _err = capsys.readouterr()
-    assert out.strip() == "SKIP: Function operates only on ECS Container Instance State Change events."
+    assert lambda_function.adjust_service_desired_count.call_count == 0
 
 
 def test_event_matches(ecs_event, mocker, monkeypatch):
     monkeypatch.setenv('ECS_SERVICE_ARN', AGENT_SERVICE_ARN)
-    # Don't actually run the underlying function, only ensure it was called
     mocker.patch.object(lambda_function, 'adjust_service_desired_count')
     lambda_function.lambda_handler(ecs_event, None)
     assert lambda_function.adjust_service_desired_count.call_count == 1
 
 
-def tests_skip_when_service_not_in_cluster(capsys):
+def tests_skip_when_service_not_in_cluster():
     ecs = botocore.session.get_session().create_client('ecs')
     stubber = Stubber(ecs)
 
@@ -77,9 +76,7 @@ def tests_skip_when_service_not_in_cluster(capsys):
 
     with stubber:
         response = lambda_function.adjust_service_desired_count(ecs, 'cluster1', AGENT_SERVICE_ARN)
-        out, _err = capsys.readouterr()
-    assert response is None
-    assert out.strip() == "SKIP: Service not found in cluster cluster1"
+        assert response is None
 
 
 def test_adjusts_service_when_mismatch(cluster_response):
