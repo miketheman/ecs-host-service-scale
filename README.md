@@ -8,6 +8,19 @@ A Lambda function to ensure an ECS Service is set to the correct Desired Count f
 - `ECS_SERVICE_ARN` environment variable
 - IAM Role/Policy access setup
 
+## Flow
+
+![UML Sequence Flow](http://uml.mvnsearch.org/gist/00347bf8cfd22ac011f0e8f1bfa12359)
+
+## Deployment
+
+The function is meant to be deployed as a non-VPC Lambda function. It will probably work in a VPC environment, given an Internet Gateway and proper permissions, but it simply does not need access to any in-VPC resources, only AWS API calls.
+
+- IAM Policy & IAM Role allowing: `ecs:Describe*` and `ecs:UpdateService`
+- CloudWatch Event Rule for: `{"source": ["aws.ecs"], "detail-type": ["ECS Container Instance State Change"]}`
+- Code from `lambda_function.py`
+- The ECS Service ARN environment variable
+
 ## Testing
 
 - Install all requirements via `pip install -r requirements.txt`
