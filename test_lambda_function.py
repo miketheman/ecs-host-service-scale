@@ -1,6 +1,5 @@
 import json
 
-import botocore.session
 from botocore.stub import Stubber
 import pytest
 
@@ -65,7 +64,7 @@ def test_event_matches(ecs_event, mocker, monkeypatch):
 
 
 def tests_skip_when_service_not_in_cluster():
-    ecs = botocore.session.get_session().create_client('ecs')
+    ecs = lambda_function.ecs_client()
     stubber = Stubber(ecs)
 
     describe_services_response = {
@@ -80,7 +79,7 @@ def tests_skip_when_service_not_in_cluster():
 
 
 def test_adjusts_service_when_mismatch(cluster_response):
-    ecs = botocore.session.get_session().create_client('ecs')
+    ecs = lambda_function.ecs_client()
     stubber = Stubber(ecs)
 
     describe_services_response = {
@@ -116,7 +115,7 @@ def test_adjusts_service_when_mismatch(cluster_response):
 
 
 def test_adjusts_nothing_when_equal(cluster_response):
-    ecs = botocore.session.get_session().create_client('ecs')
+    ecs = lambda_function.ecs_client()
     stubber = Stubber(ecs)
 
     describe_services_response = {
