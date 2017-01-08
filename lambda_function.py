@@ -4,6 +4,8 @@ A Lambda Function to set the desired count of running tasks
 in a service based on a cluster's containter instances.
 Designed to be triggered by a CloudWatch Event rule.
 """
+from __future__ import print_function
+
 import os
 
 import boto3
@@ -17,7 +19,7 @@ def adjust_service_desired_count(ecs_client, cluster, service):
     running_service = ecs_client.describe_services(cluster=cluster, services=[service])
 
     if not running_service["services"]:
-        print "SKIP: Service not found in cluster {}".format(cluster)
+        print("SKIP: Service not found in cluster {}".format(cluster))
         return
 
     desired_task_count = running_service["services"][0]["desiredCount"]
@@ -26,22 +28,22 @@ def adjust_service_desired_count(ecs_client, cluster, service):
     registered_instances = clusters["clusters"][0]["registeredContainerInstancesCount"]
 
     if desired_task_count != registered_instances:
-        print "Adjusting cluster '{}' to run {} tasks of service '{}'".format(
+        print("Adjusting cluster '{}' to run {} tasks of service '{}'".format(
             cluster, registered_instances, service
-        )
+        ))
         response = ecs_client.update_service(
             cluster=cluster,
             service=service,
             desiredCount=registered_instances
         )
 
-        print response
+        print(response)
         return response
 
     # Do nothing otherwise
-    print "SKIP: Cluster {} has {} desired tasks for {} registered instances.".format(
+    print("SKIP: Cluster {} has {} desired tasks for {} registered instances.".format(
         cluster, desired_task_count, registered_instances
-    )
+    ))
     return
 
 
@@ -64,4 +66,4 @@ def lambda_handler(event, context):
     # Valid event, and one we are interested in
     cluster = event["detail"]["clusterArn"]
     adjust_service_desired_count(ecs_client(), cluster, service)
-    print "DONE"
+    print("DONE")
