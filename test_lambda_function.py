@@ -70,7 +70,7 @@ def tests_skip_when_service_not_in_cluster(capsys):
     stubber = Stubber(ecs)
 
     describe_services_response = {
-        'services': []
+        'services': [],
     }
     expected_params = {'cluster': 'cluster1', 'services': [AGENT_SERVICE_ARN]}
     stubber.add_response('describe_services', describe_services_response, expected_params)

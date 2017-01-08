@@ -34,7 +34,7 @@ def adjust_service_desired_count(ecs_client, cluster, service):
         response = ecs_client.update_service(
             cluster=cluster,
             service=service,
-            desiredCount=registered_instances
+            desiredCount=registered_instances,
         )
 
         print(response)
